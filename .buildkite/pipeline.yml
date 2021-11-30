@@ -1,0 +1,22 @@
+env:
+  ARTIFACT_NAME: crocodile
+  GOPRIVATE: github.com/equinixmetal/*,go.equinixmetal.net
+  IMAGE_TAG: ${BUILDKITE_BUILD_NUMBER}-${BUILDKITE_COMMIT:0:8}
+  BUILD_URL: https://buildkite.com/equinix/crocodile/builds/${BUILDKITE_BUILD_NUMBER}
+  GIT_REPO: dlaube/crocodile
+
+steps:
+  - label: ":docker: docker build croc"
+    key: "build"
+    depends_on: ["lint", "test"]
+    commands: |
+      #!/bin/bash
+      echo --- Build Docker Image
+      docker build -t croc .
+
+
+  - label: ":docker: run croc"
+    key: "gobuild"
+    commands:
+      - docker run -e PACKER_LOG=1 --privileged -it --rm -v $PWD/packer_cache:/packer/packer_cache -v $PWD/images:/var/tmp/images -v /dev/net:/dev/net --net=host --device=/dev/kvm croc:latest
+    artifact_paths: "${ARTIFACT_NAME}"
