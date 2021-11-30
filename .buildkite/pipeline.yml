@@ -18,5 +18,5 @@ steps:
   - label: ":docker: run croc"
     key: "gobuild"
     commands:
-      - docker run -e PACKER_LOG=1 --privileged -it --rm -v $PWD/packer_cache:/packer/packer_cache -v $PWD/images:/var/tmp/images -v /dev/net:/dev/net --net=host --device=/dev/kvm croc:latest
+      - docker run -e PACKER_LOG=1 --privileged -it --rm -v $PWD/packer_cache:/packer/packer_cache -v $PWD/images:/var/tmp/images -v /dev/net:/dev/net --net=host --device=/dev/kvm --device=/dev/net/tun --cap-add=NET_ADMIN croc:latest
     artifact_paths: "${ARTIFACT_NAME}"
